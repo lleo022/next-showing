@@ -1,6 +1,5 @@
 # parser.py
 import pandas as pd
-import sys
 from pathlib import Path
 from datetime import date
 from pydantic import BaseModel
@@ -17,8 +16,8 @@ class FilmEntry(BaseModel):
     letterboxd_uri: Optional[str] = None
 
 class UserProfile(BaseModel):
-    watched: list[FilmEntry]         # all watched films (for exclusion)
-    rated: list[FilmEntry]           # rated films only (for taste)
+    watched: list[FilmEntry]         # for exclusion purposes
+    rated: list[FilmEntry]           # for taste data
     total_watched: int
     total_rated: int
     has_taste_data: bool
@@ -101,38 +100,3 @@ def build_user_profile(
         has_taste_data=len(rated) > 0,
         parse_errors=all_errors,
     )
-
-
-# CLI Test
-if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Usage: uv run parser.py watched.csv [ratings.csv]")
-        sys.exit(1)
-
-    watched_path = Path(sys.argv[1])
-    ratings_path = Path(sys.argv[2]) if len(sys.argv) > 2 else None
-
-    profile = build_user_profile(watched_path, ratings_path)
-
-    print(f"\nWatched: {profile.total_watched} films")
-    print(f"Rated:   {profile.total_rated} films")
-    print(f"Taste data available: {profile.has_taste_data}")
-
-    if profile.parse_errors:
-        print(f"\nWarnings ({len(profile.parse_errors)}):")
-        for e in profile.parse_errors:
-            print(f"  - {e}")
-
-    print("\nFirst 5 watched:")
-    for f in profile.watched[:5]:
-        print(f"  {f.title} ({f.year})")
-
-    if profile.rated:
-        print("\nFirst 5 rated:")
-        for f in profile.rated[:5]:
-            print(f"  {f.title} ({f.year})  ★ {f.rating}")
-
-    out_path = watched_path.stem + "_profile.json"
-    with open(out_path, "w") as f:
-        f.write(profile.model_dump_json(indent=2))
-    print(f"\nFull output saved to {out_path}")
