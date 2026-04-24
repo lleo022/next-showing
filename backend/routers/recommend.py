@@ -104,7 +104,7 @@ async def recommend(body: RecommendRequest):
         # --- Step 4: OMDb enrichment ---
         enriched: list[dict] = []
         for c in candidates:
-            omdb: dict = {"imdb_rating": "N/A", "metascore": "N/A", "rotten_tomatoes": "N/A"}
+            omdb: dict = {"imdb_score": "N/A", "metascore": "N/A", "rotten_tomatoes": "N/A"}
             if c.get("imdb_id"):
                 try:
                     omdb = await _omdb_enrich(client, c["imdb_id"], omdb_key)
@@ -182,7 +182,7 @@ async def recommend(body: RecommendRequest):
             year=int((details.get("release_date") or "0")[:4]),
             overview=details.get("overview", ""),
             poster_url=f"{POSTER_BASE}{poster_path}" if poster_path else "",
-            imdb_rating=ratings.get("imdb_rating", "N/A"),
+            imdb_score=ratings.get("imdb_score", "N/A"),
             metascore=ratings.get("metascore", "N/A"),
             rotten_tomatoes=ratings.get("rotten_tomatoes", "N/A"),
             explanation=pick.get("explanation", ""),

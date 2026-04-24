@@ -1,3 +1,6 @@
+import os
+from contextlib import asynccontextmanager
+
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -6,7 +9,18 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from routers import parse, recommend
 
-app = FastAPI()
+_REQUIRED_KEYS = ("TMDB_API_KEY", "OMDB_API_KEY", "ANTHROPIC_API_KEY")
+
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    missing = [k for k in _REQUIRED_KEYS if not os.getenv(k)]
+    if missing:
+        raise RuntimeError(f"Missing required environment variables: {', '.join(missing)}")
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,

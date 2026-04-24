@@ -16,7 +16,7 @@ class RecommendResponse(BaseModel):
     year: int
     overview: str
     poster_url: str
-    imdb_rating: str
+    imdb_score: str
     metascore: str
     rotten_tomatoes: str
     explanation: str

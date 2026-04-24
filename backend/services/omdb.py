@@ -16,7 +16,7 @@ async def _omdb_enrich(client: httpx.AsyncClient, imdb_id: str, api_key: str) ->
         "N/A",
     )
     return {
-        "imdb_rating": data.get("imdbRating", "N/A"),
+        "imdb_score": data.get("imdbRating", "N/A"),
         "metascore": data.get("Metascore", "N/A"),
         "rotten_tomatoes": rt,
     }
