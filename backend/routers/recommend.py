@@ -137,17 +137,46 @@ async def recommend(body: RecommendRequest):
             for c in unwatched
         ]
 
+        has_taste_data = len(body.rated) > 0
+        top_films_str = ""
+        if has_taste_data:
+            sorted_rated = sorted(
+                body.rated, key=lambda f: f.rating or 0, reverse=True
+            )
+            top_films = [f for f in sorted_rated if f.rating is not None and f.rating >= 4.5][:10]
+            if len(top_films) < 10:
+                four_plus = [
+                    f for f in sorted_rated if f.rating is not None and 4.0 <= f.rating < 4.5
+                ]
+                top_films += four_plus[: 10 - len(top_films)]
+            top_films_str = ", ".join(f"{f.title} ({f.rating:.1f}★)" for f in top_films)
+
+        system_prompt = (
+            "You are a film recommendation expert with deep knowledge of cinema. "
+            "You have studied this user's Letterboxd history and understand their taste intimately.\n\n"
+        )
+        if has_taste_data:
+            system_prompt += (
+                f"Their highest-rated films include: {top_films_str}.\n"
+                "Use these as anchors — connect your recommendation to their demonstrated taste "
+                "when relevant, but don't force it if the request is very specific.\n\n"
+            )
+        system_prompt += (
+            "Given the user's request and the candidate films (with ratings), "
+            "pick the single best match. Prioritise fit with the request and the user's taste "
+            "over raw critical scores, but don't recommend something poorly reviewed unless "
+            "it directly matches a niche the user clearly loves.\n\n"
+            "Respond in JSON only with this exact shape:\n"
+            '{"tmdb_id": int, "title": string, "year": int, "explanation": string}\n\n'
+            "The explanation should be 2-4 sentences, written as if you know the user. "
+            "If taste data is available, reference at least one of their favourites by name."
+        )
+
         ai_client = anthropic.Anthropic(api_key=anthropic_key)
         message = ai_client.messages.create(
             model="claude-sonnet-4-20250514",
             max_tokens=1024,
-            system=(
-                "You are a movie recommendation expert. Given a user request and a list "
-                "of candidate movies with ratings, pick the single best match. Consider "
-                "how well it matches the request, critical reception, and overall quality. "
-                "Respond in JSON only with this exact shape:\n"
-                '{"tmdb_id": int, "title": string, "year": int, "explanation": string}'
-            ),
+            system=system_prompt,
             messages=[
                 {
                     "role": "user",

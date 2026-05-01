@@ -19,6 +19,7 @@ export default function TestPage() {
   const [parseStatus, setParseStatus] = useState<string>("");
   const [parseError, setParseError] = useState<string>("");
   const [watched, setWatched] = useState<unknown[] | null>(null);
+  const [rated, setRated] = useState<unknown[] | null>(null);
 
   const [request, setRequest] = useState("");
   const [loading, setLoading] = useState(false);
@@ -42,6 +43,7 @@ export default function TestPage() {
       if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
       const data = await res.json();
       setWatched(data.watched);
+      setRated(data.rated ?? []);
       setParseStatus(`Loaded ${data.total_watched} watched, ${data.total_rated} rated`);
     } catch (e) {
       setParseError(e instanceof Error ? e.message : "Parse failed");
@@ -58,7 +60,7 @@ export default function TestPage() {
       const res = await fetch("http://localhost:8000/recommend", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ request: request.trim(), watched }),
+        body: JSON.stringify({ request: request.trim(), watched, rated: rated ?? [] }),
       });
       if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
       const data = await res.json();

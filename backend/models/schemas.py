@@ -6,9 +6,16 @@ class WatchedFilm(BaseModel):
     year: int | None = None
 
 
+class RatedFilm(BaseModel):
+    title: str
+    year: int | None = None
+    rating: float | None = None
+
+
 class RecommendRequest(BaseModel):
     request: str
     watched: list[WatchedFilm]
+    rated: list[RatedFilm] = []
 
 
 class RecommendResponse(BaseModel):
