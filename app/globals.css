@@ -1,8 +1,37 @@
+/* app/globals.css — extends the existing Tailwind base with Next Showing tokens. */
+
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* — base (existing) — */
+  --background: #0a0908;
+  --foreground: #f4ece0;
+
+  /* — Next Showing tokens — */
+  --ns-bg: #0a0908;
+  --ns-bg-2: #131110;
+  --ns-surface: rgba(28, 24, 22, 0.72);
+  --ns-surface-solid: #1c1816;
+  --ns-border: rgba(255, 240, 220, 0.09);
+  --ns-border-strong: rgba(255, 240, 220, 0.18);
+  --ns-fg: #f4ece0;
+  --ns-fg-dim: rgba(244, 236, 224, 0.62);
+  --ns-fg-mute: rgba(244, 236, 224, 0.38);
+  --ns-accent: #e8a55c;
+  --ns-accent-deep: #c47a2c;
+  --ns-accent-glow: rgba(232, 165, 92, 0.18);
+  --ns-good: #9ec48a;
+
+  --ns-radius-sm: 6px;
+  --ns-radius: 10px;
+  --ns-radius-lg: 16px;
+
+  --ns-shadow-1: 0 1px 2px rgba(0,0,0,0.4), 0 4px 16px rgba(0,0,0,0.25);
+  --ns-shadow-2: 0 8px 32px rgba(0,0,0,0.5), 0 2px 4px rgba(0,0,0,0.4);
+
+  --ns-font-display: var(--font-instrument-serif), "Times New Roman", serif;
+  --ns-font-body: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --ns-font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, monospace;
 }
 
 @theme inline {
@@ -10,17 +39,157 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-instrument-serif);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html, body {
+  background: var(--ns-bg);
+  color: var(--ns-fg);
+  font-family: var(--ns-font-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ─── primitives ─────────────────────────────────────── */
+
+.ns-mono {
+  font-family: var(--ns-font-mono);
+  letter-spacing: 0;
 }
+
+.ns-display {
+  font-family: var(--ns-font-display);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1;
+}
+
+.ns-eyebrow {
+  font-family: var(--ns-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ns-fg-mute);
+}
+
+.ns-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid var(--ns-border);
+  background: transparent;
+  color: var(--ns-fg-dim);
+  font-family: var(--ns-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  white-space: nowrap;
+}
+.ns-chip:hover {
+  border-color: var(--ns-border-strong);
+  color: var(--ns-fg);
+}
+.ns-chip[data-active="true"] {
+  border-color: var(--ns-accent);
+  color: var(--ns-accent);
+  background: var(--ns-accent-glow);
+}
+
+.ns-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 18px;
+  border-radius: var(--ns-radius);
+  border: 1px solid transparent;
+  font-family: var(--ns-font-body);
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+}
+.ns-btn-primary {
+  background: var(--ns-accent);
+  color: #1a0f00;
+  border-color: var(--ns-accent);
+}
+.ns-btn-primary:hover { background: #f0b270; border-color: #f0b270; }
+.ns-btn-primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.ns-btn-ghost {
+  background: transparent;
+  color: var(--ns-fg-dim);
+  border-color: var(--ns-border);
+}
+.ns-btn-ghost:hover {
+  color: var(--ns-fg);
+  border-color: var(--ns-border-strong);
+}
+
+.ns-glass {
+  background: var(--ns-surface);
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  border: 1px solid var(--ns-border);
+  border-radius: var(--ns-radius-lg);
+}
+
+.ns-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--ns-fg);
+  font-family: var(--ns-font-body);
+  font-size: 15px;
+  resize: none;
+}
+.ns-input::placeholder { color: var(--ns-fg-mute); }
+
+/* poster placeholder — diagonal stripes, used until TMDB poster_url is present */
+.ns-poster-ph {
+  position: relative;
+  background:
+    repeating-linear-gradient(135deg, rgba(232,165,92,0.08) 0, rgba(232,165,92,0.08) 2px, transparent 2px, transparent 12px),
+    radial-gradient(80% 60% at 50% 30%, rgba(196,122,44,0.25) 0%, transparent 60%),
+    linear-gradient(180deg, #2a1f15 0%, #0a0604 100%);
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+}
+
+/* film grain overlay */
+.ns-grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.06;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.6'/></svg>");
+}
+
+@keyframes ns-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+.ns-pulse-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--ns-accent);
+  animation: ns-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes ns-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.ns-fade-in { animation: ns-fade-in 0.5s ease-out both; }
