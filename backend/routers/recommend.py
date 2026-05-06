@@ -42,6 +42,15 @@ async def recommend(body: RecommendRequest):
     }
 
     async with httpx.AsyncClient() as client:
+        # --- Ollama health check ---
+        try:
+            await client.get("http://localhost:11434/", timeout=2.0)
+        except Exception:
+            raise HTTPException(
+                status_code=503,
+                detail="Ollama is not running. Start it with: ollama serve",
+            )
+
         # --- Step 1: Classify request via Ollama ---
         classification = await _classify_request(client, body.request)
         req_type = classification.get("type", "B")
@@ -130,7 +139,7 @@ async def recommend(body: RecommendRequest):
                 "title": c.get("title"),
                 "year": (c.get("release_date") or "")[:4],
                 "overview": c.get("overview"),
-                "imdb_rating": c.get("imdb_rating"),
+                "imdb_score": c.get("imdb_score"),
                 "metascore": c.get("metascore"),
                 "rotten_tomatoes": c.get("rotten_tomatoes"),
             }
